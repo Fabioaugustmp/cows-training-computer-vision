@@ -1,3 +1,6 @@
+# cows-training-computer-vision
+Objective dairy cow mobility analyses and scoring system using computer vision-based keypoint
+
 1 - train.py
 2 - prediction.py
 3 - conversion.py
