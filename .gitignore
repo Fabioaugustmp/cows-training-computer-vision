@@ -211,3 +211,5 @@ images/*
 
 yolo11*
 yolo26*
+dataset/*
+images-old/*

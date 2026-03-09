@@ -1,0 +1,8 @@
+ultralytics
+scikit-learn
+pyyaml
+opencv-python
+ipykernel
+torch
+torchvision
+torchaudio

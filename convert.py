@@ -84,8 +84,8 @@ def convert_all_files(input_folder, output_labels_dir):
     print(f"Success! Created {processed_count} labels.")
 
 
-JSON_FOLDER = r'C:\Users\fabio\Pictures\COWS-DATASET\05 - Camilla (pronto)-20260304T143124Z-3-001\05 - Camilla (pronto)\Key_points'
-OUTPUT_FOLDER = r'C:\Workspace\cows-train\labels\train'
+JSON_FOLDER = r'G:\.shortcut-targets-by-id\1xfU7Yl_DH9hYd36IT5RfJ1Quhm8ijZr8\Rotulação de Vacas\06 - Carlos Augusto (pronto)\Key_points'
+OUTPUT_FOLDER = r'C:\Workspace\cows-train\labels\val'
 
 if __name__ == "__main__":
     convert_all_files(JSON_FOLDER, OUTPUT_FOLDER)

@@ -1,0 +1,8 @@
+kpt_shape:
+- 9
+- 3
+names:
+  0: cow
+path: C:\Workspace\cows-train
+train: C:\Workspace\cows-train\kfold_splits_firt_gen\fold_3_train.txt
+val: C:\Workspace\cows-train\kfold_splits_firt_gen\fold_3_val.txt
