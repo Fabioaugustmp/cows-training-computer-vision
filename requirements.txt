@@ -8,3 +8,5 @@ torchvision
 torchaudio
 pandas
 pandas-stubs
+seaborn
+tabulate
