@@ -7,12 +7,13 @@ from ultralytics import YOLO
 import math
 
 # --- Configuração ---
-# Utilizando os pesos do Fold 1 como modelo representante
 MODEL_PATH = 'runs/pose/runs/pose_kfold/cow_pose_kfold_1/weights/best.pt'
 DATASET_PATH = Path('dataset/images')
 OUTPUT_CSV = 'cow_features.csv'
+CONF_THRESHOLD = 0.6  # Confiança mínima para detecção da vaca
+KPT_CONF_THRESHOLD = 0.5  # Confiança média mínima para os pontos (keypoints)
 
-# Mapeamento de Keypoints conforme o seu modelo
+# Mapeamento de Keypoints (conforme seu modelo)
 KPT = {
     'neck': 0, 'withers': 1, 'back': 2,
     'hook_l': 3, 'hook_r': 4, 'hip': 5,
@@ -20,23 +21,24 @@ KPT = {
 }
 
 
+def calculate_dist(p1, p2):
+    """Calcula a distância euclidiana entre dois pontos."""
+    return np.linalg.norm(np.array(p1) - np.array(p2))
+
+
 def calculate_angle(p1, p2, p3):
-    """Calcula o ângulo no ponto p2 dados p1, p2 e p3."""
+    """Calcula o ângulo no ponto p2 dados os pontos p1, p2 e p3."""
     v1 = np.array(p1) - np.array(p2)
     v2 = np.array(p3) - np.array(p2)
-
     norm1 = np.linalg.norm(v1)
     norm2 = np.linalg.norm(v2)
-    if norm1 == 0 or norm2 == 0:
-        return 0.0
-
+    if norm1 == 0 or norm2 == 0: return 180.0
     arg = np.dot(v1, v2) / (norm1 * norm2)
-    arg = np.clip(arg, -1.0, 1.0)
-    return np.degrees(np.arccos(arg))
+    return np.degrees(np.arccos(np.clip(arg, -1.0, 1.0)))
 
 
 def get_cow_id(filename):
-    """Extrai o cow_id do nome do arquivo (Ex: baia16)."""
+    """Extrai o ID da baia/vaca a partir do nome do arquivo."""
     parts = filename.split('_')
     for part in parts:
         if 'baia' in part.lower():
@@ -51,7 +53,6 @@ def extract_features():
 
     print(f"Carregando modelo: {MODEL_PATH}")
     model = YOLO(MODEL_PATH)
-
     data = []
     image_files = list(DATASET_PATH.rglob('*.jpg'))
 
@@ -59,69 +60,85 @@ def extract_features():
         print(f"Nenhuma imagem encontrada em {DATASET_PATH}")
         return
 
-    print(f"Processando {len(image_files)} imagens...")
+    print(f"Processando {len(image_files)} imagens com Biometria Avançada...")
 
     for i, img_path in enumerate(image_files):
         if i % 100 == 0:
             print(f"Progresso: {i}/{len(image_files)}")
 
-        # Executa a predição
-        results = model.predict(img_path, conf=0.6, verbose=False)
+        results = model.predict(img_path, conf=CONF_THRESHOLD, verbose=False)
 
         for r in results:
-            # CORREÇÃO DO INDEXERROR: Verifica se há detecções e se keypoints existem
+            # --- CORREÇÃO DO INDEXERROR ---
+            # Verificamos se há detecções (len(r) > 0) antes de acessar o índice [0]
             if len(r) == 0 or r.keypoints is None or r.keypoints.data.shape[0] == 0:
                 continue
 
-            # Extrai os keypoints da primeira vaca detectada com segurança
-            # Usamos .cpu() antes do .numpy() para garantir compatibilidade
-            kpts = r.keypoints.data[0].cpu().numpy()
+            # Extração segura para CPU (mais estável para conversão NumPy)
+            kpts_data = r.keypoints.data[0].cpu().numpy()
 
-            # Criamos um dicionário de pontos (x, y)
-            points = {name: kpts[idx][:2] for name, idx in KPT.items()}
+            # FILTRO DE QUALIDADE: Média de confiança dos keypoints
+            avg_kpt_conf = np.mean(kpts_data[:, 2])
+            if avg_kpt_conf < KPT_CONF_THRESHOLD:
+                continue
 
-            # --- FEATURE 1: Ângulos (Curvatura) ---
-            withers_angle = calculate_angle(points['neck'], points['withers'], points['back'])
-            back_angle = calculate_angle(points['withers'], points['back'], points['hip'])
-            hip_angle = calculate_angle(points['back'], points['hip'], points['tail'])
+            # Mapeamento de pontos (x, y)
+            points = {name: kpts_data[idx][:2] for name, idx in KPT.items()}
 
-            # --- FEATURE 2: Distâncias Normalizadas (Proporções) ---
-            # Fator de normalização: Comprimento do corpo (Pescoço até a Cauda)
-            body_length = np.linalg.norm(points['neck'] - points['tail'])
-            if body_length == 0: body_length = 1.0
+            # Comprimento base para normalização (Pescoço até Cauda)
+            body_len = calculate_dist(points['neck'], points['tail'])
+            if body_len < 10: continue  # Ignora detecções espúrias ou muito pequenas
 
-            # Larguras Relativas
-            hook_width = np.linalg.norm(points['hook_l'] - points['hook_r']) / body_length
-            pin_width = np.linalg.norm(points['pin_l'] - points['pin_r']) / body_length
+            # Larguras pélvicas
+            h_width = calculate_dist(points['hook_l'], points['hook_r'])
+            p_width = calculate_dist(points['pin_l'], points['pin_r'])
 
-            # Comprimentos de Segmentos Relativos
-            neck_to_withers = np.linalg.norm(points['neck'] - points['withers']) / body_length
-            withers_to_back = np.linalg.norm(points['withers'] - points['back']) / body_length
-            back_to_hip = np.linalg.norm(points['back'] - points['hip']) / body_length
-            hip_to_tail = np.linalg.norm(points['hip'] - points['tail']) / body_length
+            # --- RATIOS BIOMÉTRICOS (Estabilidade de Identificação) ---
+            pelvic_ratio = h_width / p_width if p_width > 0 else 0
+            body_aspect_ratio = body_len / h_width if h_width > 0 else 0
+
+            # Proporções da Coluna
+            n_to_w = calculate_dist(points['neck'], points['withers'])
+            w_to_b = calculate_dist(points['withers'], points['back'])
+            b_to_h = calculate_dist(points['back'], points['hip'])
+
+            spine_ratio_1 = n_to_w / w_to_b if w_to_b > 0 else 0
+            spine_ratio_2 = w_to_b / b_to_h if b_to_h > 0 else 0
+
+            # Índice de Simetria (Identifica desalinhamento postural)
+            dist_back_hl = calculate_dist(points['back'], points['hook_l'])
+            dist_back_hr = calculate_dist(points['back'], points['hook_r'])
+            symmetry_idx = abs(dist_back_hl - dist_back_hr) / h_width if h_width > 0 else 0
+
+            # Ângulos de Curvatura (Saúde e Bem-estar)
+            angle_w = calculate_angle(points['neck'], points['withers'], points['back'])
+            angle_b = calculate_angle(points['withers'], points['back'], points['hip'])
+            angle_h = calculate_angle(points['back'], points['hip'], points['tail'])
 
             data.append({
                 'filename': img_path.name,
                 'cow_id': get_cow_id(img_path.name),
-                'angle_withers': withers_angle,
-                'angle_back': back_angle,
-                'angle_hip': hip_angle,
-                'dist_hook_width': hook_width,
-                'dist_pin_width': pin_width,
-                'seg_neck_withers': neck_to_withers,
-                'seg_withers_back': withers_to_back,
-                'seg_back_hip': back_to_hip,
-                'seg_hip_tail': hip_to_tail
+                'pelvic_ratio': pelvic_ratio,
+                'body_aspect': body_aspect_ratio,
+                'spine_prop_1': spine_ratio_1,
+                'spine_prop_2': spine_ratio_2,
+                'symmetry_idx': symmetry_idx,
+                'angle_withers': angle_w,
+                'angle_back': angle_b,
+                'angle_hip': angle_h,
+                'norm_hook_width': h_width / body_len,
+                'norm_pin_width': p_width / body_len,
+                'avg_kpt_conf': avg_kpt_conf
             })
 
-    # Geração do arquivo final
+    # Salvamento dos dados
     if data:
         df = pd.DataFrame(data)
         df.to_csv(OUTPUT_CSV, index=False)
-        print(f"\nExtração concluída. Total de registros: {len(df)}")
-        print(f"Arquivo salvo: {OUTPUT_CSV}")
+        print(f"\nSucesso: {len(df)} perfis bovinos extraídos.")
+        print(f"Arquivo gerado: {OUTPUT_CSV}")
     else:
-        print("\nNenhuma detecção válida foi realizada para gerar o CSV.")
+        print("\nNenhum dado de alta qualidade foi encontrado para salvar.")
 
 
 if __name__ == "__main__":

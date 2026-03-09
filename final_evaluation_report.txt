@@ -1,44 +1,46 @@
-Accuracy: 25.13%
+Accuracy: 24.10%
 
 Feature Importance:
-seg_hip_tail        0.121632
-angle_withers       0.119637
-seg_withers_back    0.117993
-angle_hip           0.112610
-seg_neck_withers    0.108140
-dist_pin_width      0.107906
-angle_back          0.106250
-dist_hook_width     0.105024
-seg_back_hip        0.100810
+pelvic_ratio       0.109089
+angle_withers      0.105070
+symmetry_idx       0.099569
+avg_kpt_conf       0.098070
+angle_hip          0.095813
+angle_back         0.095663
+spine_prop_2       0.083939
+norm_pin_width     0.083049
+spine_prop_1       0.082637
+body_aspect        0.074888
+norm_hook_width    0.072213
 
 Classification Report:
               precision    recall  f1-score   support
 
-       baia1       0.14      0.14      0.14         7
-      baia10       0.43      0.38      0.40         8
-      baia11       0.36      0.50      0.42         8
-      baia12       0.33      0.25      0.29         8
-      baia13       0.30      0.33      0.32         9
-      baia14       0.40      0.22      0.29         9
-      baia15       0.50      0.44      0.47         9
-      baia16       0.22      0.22      0.22         9
+       baia1       0.00      0.00      0.00         7
+      baia10       0.36      0.57      0.44         7
+      baia11       0.25      0.12      0.17         8
+      baia12       0.25      0.25      0.25         8
+      baia13       0.21      0.33      0.26         9
+      baia14       0.00      0.00      0.00         9
+      baia15       0.33      0.33      0.33         9
+      baia16       0.08      0.11      0.09         9
       baia17       0.00      0.00      0.00         8
-      baia18       0.20      0.22      0.21         9
-      baia19       0.25      0.12      0.17         8
-       baia2       0.12      0.14      0.13         7
-      baia20       0.07      0.11      0.08         9
-      baia21       0.29      0.22      0.25         9
-      baia22       0.25      0.11      0.15         9
-      baia23       0.38      0.38      0.38         8
-      baia24       0.28      0.56      0.37         9
-       baia3       0.33      0.43      0.38         7
-       baia4       0.11      0.14      0.12         7
-       baia5       0.12      0.14      0.13         7
-       baia6       0.33      0.25      0.29         8
-       baia7       0.38      0.38      0.38         8
-       baia8       0.14      0.14      0.14         7
-       baia9       0.20      0.12      0.15         8
+      baia18       0.33      0.33      0.33         9
+      baia19       0.25      0.11      0.15         9
+       baia2       0.33      0.57      0.42         7
+      baia20       0.00      0.00      0.00         9
+      baia21       0.36      0.44      0.40         9
+      baia22       0.00      0.00      0.00         9
+      baia23       0.17      0.12      0.14         8
+      baia24       0.32      0.67      0.43         9
+       baia3       0.33      0.29      0.31         7
+       baia4       0.20      0.43      0.27         7
+       baia5       0.00      0.00      0.00         7
+       baia6       0.00      0.00      0.00         8
+       baia7       0.50      0.62      0.56         8
+       baia8       0.12      0.14      0.13         7
+       baia9       0.27      0.38      0.32         8
 
-    accuracy                           0.25       195
-   macro avg       0.26      0.25      0.24       195
-weighted avg       0.26      0.25      0.25       195
+    accuracy                           0.24       195
+   macro avg       0.20      0.24      0.21       195
+weighted avg       0.19      0.24      0.21       195
