@@ -6,3 +6,5 @@ ipykernel
 torch
 torchvision
 torchaudio
+pandas
+pandas-stubs

@@ -4,12 +4,12 @@ import cv2
 def predict():
     # 1. Load your newly trained custom model
     # Make sure the path matches your 'Results saved to' location from the last run
-    model = YOLO(r'C:\Workspace\cows-train\runs\pose\train\weights\best.pt')
+    model = YOLO(r'C:\Workspace\cows-train\runs\pose\runs\pose_kfold\cow_pose_kfold_5\weights\best.pt')
 
     # 2. Run prediction on a new image
     # Replace 'test_cow.jpg' with a path to a cow image the model hasn't seen
     results = model.predict(
-        source='RLC1_00_20260102064248_baia12_RLC1.jpg',
+        source='RLC3_00_20260115201853_baia7_RLC3.jpg',
         save=True,
         conf=0.25,
         imgsz = 640,  # Force standard size
