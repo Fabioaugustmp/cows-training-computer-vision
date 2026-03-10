@@ -138,10 +138,21 @@ async def predict(file: UploadFile = File(...)):
     
     print(f"[DEBUG] Vetor de Entrada: {df_feat.values}")
     
-    pred_idx = CLF.predict(df_feat)[0]
+    pred_idx = int(CLF.predict(df_feat)[0])
     cow_id = LE.inverse_transform([pred_idx])[0]
+    
+    # Se cow_id for um tipo numpy (como np.int64), converta para Python nativo
+    if hasattr(cow_id, 'item'):
+        cow_id = cow_id.item()
+    elif isinstance(cow_id, np.generic):
+        cow_id = cow_id.tolist()
+    # Caso seja string vinda de pasta (dataset_classificação), já está ok, 
+    # mas garantimos convertendo para str se for o caso de IDs numéricos.
+    if isinstance(cow_id, (np.integer, int)):
+        cow_id = str(cow_id)
+
     probabilities = CLF.predict_proba(df_feat)[0]
-    prob = probabilities[pred_idx]
+    prob = float(probabilities[pred_idx])
 
     # 6. Desenhar Esqueleto (Visual aprimorado)
     # Aumentar espessura para screenshots de alta resolução

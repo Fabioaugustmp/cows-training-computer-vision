@@ -77,6 +77,24 @@ python src/evaluate_model.py
 - **Visualization** (`python src/fiftyone_viz.py`): An interactive "X-Ray" view of the AI's detections.
 - **Inference** (`python src/prediction.py`): The final tool to take a new photo and identify: "This is Cow #24."
 
+## 🖥️ Web Interface (GUI) - CowID Analyzer
+The project includes a real-time web interface for easy cow identification and biometric visualization.
+
+### How it Works:
+1. **Frontend (React)**: A clean, interactive dashboard where users can upload top-view images of cows.
+2. **Backend (FastAPI)**: Receives the image, runs the YOLO Pose model to detect keypoints, calculates 11 biometric features, and uses the Random Forest classifier to predict the animal's ID.
+3. **Visual Feedback**: Returns an "AI X-Ray" image with the skeleton and keypoints drawn, along with the predicted ID and a detailed breakdown of the animal's biometric measurements.
+
+### How to Run:
+**1. Start the API Server:**
+```bash
+python src/app.py
+```
+*Wait until you see `Uvicorn running on http://0.0.0.0:8000`.*
+
+**2. Open the UI:**
+Simply open the `src/index.html` file in any modern web browser (Chrome, Edge, Firefox).
+
 ## 🏆 Model Artifacts
 
 The project maintains the most stable and performant models in the `models/` directory:
