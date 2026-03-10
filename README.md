@@ -12,54 +12,65 @@ This repository contains the source code, data, and models for cow identificatio
 - **`docs/`**: Project documentation, guides, and problem descriptions.
 - **`runs/`**: (Auto-generated) YOLO training outputs and logs.
 
-## 🚀 Execution Pipeline
+## 🚀 Execution Pipeline: How to Run & How it Works
 
-To reproduce the full biometric identification workflow, execute the scripts in the following order:
+To reproduce the full biometric identification workflow, execute these scripts in order.
 
 ### 1. Data Preparation
-Organize and convert labels from Label Studio format to YOLO Pose format.
+**The Command:**
 ```bash
 python src/organize_labels.py
 ```
+*   **Expert View:** Translating Label Studio JSON coordinates into YOLO Pose normalized TXT format.
+*   **Simple Explanation:** **"Translating the Map."** Humans mark points on images (like the neck or hip). This script translates those human marks into a simple language that the AI "eye" can read.
 
-### 2. Model Training (Pose Estimation)
-Train the YOLO model to detect cow keypoints.
+### 2. Model Training - Pose Estimation
+**The Command:**
 ```bash
+python src/train.py
+# OR for robust K-Fold validation:
 python src/kfold_train.py
 ```
-#### OR for robust K-Fold validation:
-
-```bash
-python src/kfold_train.py
-```
+*   **Expert View:** Supervised learning of a Deep Neural Network (YOLO) for keypoint regression.
+*   **Simple Explanation:** **"AI Eye School."** We show the computer thousands of photos until it learns to recognize the 9 specific "GPS points" on a cow's body.
 
 ### 3. Biometric Feature Extraction
-Use the trained YOLO model (stored in `runs/` or `models/`) to extract unique biometric ratios and angles from the images.
+**The Command:**
 ```bash
 python src/extract_features.py
 ```
+*   **Expert View:** Geometric computer vision. Calculating Euclidean distances and angles between keypoints, followed by length-normalization.
+*   **Simple Explanation:** **"The Digital Tailor."** Once the AI knows where the body parts are, this script measures the distance between hips, the angle of the back, etc. It uses **proportions** so it works even as the animal grows.
 
 ### 4. Descriptive Analysis (Step 4)
-Analyze the extracted features to identify correlations and the most discriminating biometric markers.
+**The Command:**
 ```bash
 python src/step-4.py
 ```
+*   **Expert View:** Exploratory Data Analysis (EDA) and variance analysis to identify discriminating features.
+*   **Simple Explanation:** **"Finding the ID Card."** We look at all measurements to see which ones are the most "unique" to tell cows apart.
 
 ### 5. Identification Classifier Training (Step 5)
-Train the Machine Learning classifier (Random Forest) to recognize individual cows based on their biometric profiles.
+**The Command:**
 ```bash
 python src/step-5.py
 ```
+*   **Expert View:** Training a Random Forest Ensemble Classifier on tabular biometric data.
+*   **Simple Explanation:** **"The Master Detective."** We give the measurements to the computer so it learns that "Cow A" usually has a specific body shape, building a mental database.
 
 ### 6. Performance Evaluation (Step 6)
-Generate the final accuracy reports and feature importance metrics.
+**The Command:**
 ```bash
 python src/step-6.py
 ```
+*   **Expert View:** Validating the classifier using a test set to generate a confusion matrix and F1-score.
+*   **Simple Explanation:** **"The Final Exam."** We test the AI with cows it hasn't seen before to see if it correctly identifies them. This script gives the "Final Grade."
+
+---
 
 ### 🔍 Visualization & Inference
-- **Visualization**: Use `python src/fiftyone_viz.py` to inspect keypoint detections interactively.
-- **Inference**: Use `python src/prediction.py` to run the model on new, unseen images.
+- **Visualization** (`python src/fiftyone_viz.py`): An interactive "X-Ray" view of the AI's detections.
+- **Inference** (`python src/prediction.py`): The final tool to take a new photo and identify: "This is Cow #24."
 
 ## 🏆 Model Artifacts
 
