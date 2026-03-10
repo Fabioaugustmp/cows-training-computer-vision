@@ -57,7 +57,29 @@ The final evaluation (`src/step-6.py`) provides a granular view of the system's 
 
 ---
 
-## 4. System Implementation Summary
+## 4. Results and Discussion
+
+### 4.1 Feature Importance Analysis
+The Random Forest model evaluated the discriminative power of each engineered feature. The top 5 features contributing to individual identification were:
+
+1.  **Pelvic Ratio (10.91%)**: High discriminative power as expected from morphological literature.
+2.  **Angle Withers (10.51%)**: Indicates unique spinal posture at the shoulder level.
+3.  **Symmetry Index (9.96%)**: Captures individual standing/postural habits.
+4.  **Keypoint Confidence (9.81%)**: Reflects the stability of the pose estimation for specific animals.
+5.  **Hip Angle (9.58%)**: Additional pelvic geometry marker.
+
+### 4.2 Classification Performance
+The system achieved an **overall identification accuracy of 24.10%** across 24 distinct animal classes (baia identifiers). While this indicates a significant improvement over random chance (which would be ~4%), it also highlights the challenge of identifying animals in a high-density milking station environment.
+
+**Detailed Performance Metrics:**
+- **Best Identified Classes:** `baia7` (62% recall, 0.56 F1), `baia10` (57% recall, 0.44 F1), and `baia24` (67% recall, 0.43 F1).
+- **Observation:** Several classes (`baia1`, `baia14`, `baia20`, etc.) showed 0% recall, suggesting either insufficient training data or high morphological similarity between these specific individuals in the current feature space.
+
+### 4.3 Visual Evidence
+- **Feature Registry**: A total of 195 test samples were processed and archived in `results/cow_features.csv`.
+- **Qualitative Samples**: Annotated output images (e.g., `results/labeled_cow_result.jpg`) confirm that the YOLO Pose model successfully localizes the 9 anatomical markers even under typical parlor lighting.
+
+## 5. System Implementation Summary
 The project is organized for high reproducibility:
 - **`src/`**: Modular logic for each challenge step.
 - **`models/`**: Stores the "Best-in-Class" weights for both Pose and Identification.
