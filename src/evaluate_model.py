@@ -11,7 +11,7 @@ def evaluate_model():
     try:
         artifacts = joblib.load('../models/cow_id_model.pkl')
     except FileNotFoundError:
-        print("Error: '../models/cow_id_model.pkl' not found. Run step-5.py first.")
+        print("Error: '../models/cow_id_model.pkl' not found. Run train_classifier.py first.")
         return
 
     model = artifacts['model']
