@@ -1,6 +1,6 @@
 # Biometric Identification of Dairy Cows via Top-View Keypoint Detection and Machine Learning
 
-**Author:** Fabio Augusto Marques Paula 
+**Author:** Fabio Augusto Marques Paula  
 **Date:** March 2026  
 **Subject:** Visual Computing & Machine Learning Deliverable  
 
