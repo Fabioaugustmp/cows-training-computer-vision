@@ -11,3 +11,7 @@ pandas-stubs
 seaborn
 tabulate
 fiftyone
+fastapi
+uvicorn
+python-multipart
+opencv-python
