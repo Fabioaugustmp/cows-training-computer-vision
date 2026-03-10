@@ -13,18 +13,16 @@ OUTPUT_CSV = '../results/cow_features.csv'
 CONF_THRESHOLD = 0.6  # Confiança mínima para detecção da vaca
 KPT_CONF_THRESHOLD = 0.5  # Confiança média mínima para os pontos (keypoints)
 
-# Mapeamento de Keypoints (conforme seu modelo)
+# Mapeamento de Keypoints (conforme seu modelo original)
 KPT = {
     'neck': 0, 'withers': 1, 'back': 2,
     'hook_l': 3, 'hook_r': 4, 'hip': 5,
     'tail': 6, 'pin_l': 7, 'pin_r': 8
 }
 
-
 def calculate_dist(p1, p2):
     """Calcula a distância euclidiana entre dois pontos."""
     return np.linalg.norm(np.array(p1) - np.array(p2))
-
 
 def calculate_angle(p1, p2, p3):
     """Calcula o ângulo no ponto p2 dados os pontos p1, p2 e p3."""
@@ -36,7 +34,6 @@ def calculate_angle(p1, p2, p3):
     arg = np.dot(v1, v2) / (norm1 * norm2)
     return np.degrees(np.arccos(np.clip(arg, -1.0, 1.0)))
 
-
 def get_cow_id(filename):
     """Extrai o ID da baia/vaca a partir do nome do arquivo."""
     parts = filename.split('_')
@@ -44,7 +41,6 @@ def get_cow_id(filename):
         if 'baia' in part.lower():
             return part.split('.')[0]
     return "unknown"
-
 
 def extract_features():
     if not os.path.exists(MODEL_PATH):
@@ -69,15 +65,11 @@ def extract_features():
         results = model.predict(img_path, conf=CONF_THRESHOLD, verbose=False)
 
         for r in results:
-            # --- CORREÇÃO DO INDEXERROR ---
-            # Verificamos se há detecções (len(r) > 0) antes de acessar o índice [0]
             if len(r) == 0 or r.keypoints is None or r.keypoints.data.shape[0] == 0:
                 continue
 
-            # Extração segura para CPU (mais estável para conversão NumPy)
             kpts_data = r.keypoints.data[0].cpu().numpy()
 
-            # FILTRO DE QUALIDADE: Média de confiança dos keypoints
             avg_kpt_conf = np.mean(kpts_data[:, 2])
             if avg_kpt_conf < KPT_CONF_THRESHOLD:
                 continue
@@ -87,13 +79,13 @@ def extract_features():
 
             # Comprimento base para normalização (Pescoço até Cauda)
             body_len = calculate_dist(points['neck'], points['tail'])
-            if body_len < 10: continue  # Ignora detecções espúrias ou muito pequenas
+            if body_len < 10: continue
 
             # Larguras pélvicas
             h_width = calculate_dist(points['hook_l'], points['hook_r'])
             p_width = calculate_dist(points['pin_l'], points['pin_r'])
 
-            # --- RATIOS BIOMÉTRICOS (Estabilidade de Identificação) ---
+            # --- RATIOS BIOMÉTRICOS ---
             pelvic_ratio = h_width / p_width if p_width > 0 else 0
             body_aspect_ratio = body_len / h_width if h_width > 0 else 0
 
@@ -105,7 +97,7 @@ def extract_features():
             spine_ratio_1 = n_to_w / w_to_b if w_to_b > 0 else 0
             spine_ratio_2 = w_to_b / b_to_h if b_to_h > 0 else 0
 
-            # Índice de Simetria (Identifica desalinhamento postural)
+            # Índice de Simetria
             dist_back_hl = calculate_dist(points['back'], points['hook_l'])
             dist_back_hr = calculate_dist(points['back'], points['hook_r'])
             symmetry_idx = abs(dist_back_hl - dist_back_hr) / h_width if h_width > 0 else 0

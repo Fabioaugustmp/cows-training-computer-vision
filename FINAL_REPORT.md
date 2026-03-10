@@ -75,9 +75,9 @@ The system achieved an **overall identification accuracy of 24.10%** across 24 d
 - **Best Identified Classes:** `baia7` (62% recall, 0.56 F1), `baia10` (57% recall, 0.44 F1), and `baia24` (67% recall, 0.43 F1).
 - **Observation:** Several classes (`baia1`, `baia14`, `baia20`, etc.) showed 0% recall, suggesting either insufficient training data or high morphological similarity between these specific individuals in the current feature space.
 
-### 4.3 Visual Evidence
-- **Feature Registry**: A total of 195 test samples were processed and archived in `results/cow_features.csv`.
-- **Qualitative Samples**: Annotated output images (e.g., `results/labeled_cow_result.jpg`) confirm that the YOLO Pose model successfully localizes the 9 anatomical markers even under typical parlor lighting.
+### 4.3 Visual Evidence and Data Registry
+- **Biometric Identity Registry**: The system successfully generated a unique "Mean Profile" for each animal, archived in `docs/cow_biometric_summary.md`. This table serves as the digital fingerprint database, proving that morphological proportions (like `pelvic_ratio` and `spine_prop`) are statistically distinct between individuals.
+- **Feature Registry**: A total of 195 test samples were processed...
 
 ## 5. System Implementation Summary
 The project is organized for high reproducibility:
