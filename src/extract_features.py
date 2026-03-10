@@ -8,7 +8,7 @@ import math
 
 # --- Configuração ---
 MODEL_PATH = '../runs/pose/runs/pose_kfold/cow_pose_kfold_1/weights/best.pt'
-DATASET_PATH = Path('../data/dataset/images')
+DATASET_PATH = Path('../dataset_classificação')
 OUTPUT_CSV = '../results/cow_features.csv'
 CONF_THRESHOLD = 0.6  # Confiança mínima para detecção da vaca
 KPT_CONF_THRESHOLD = 0.5  # Confiança média mínima para os pontos (keypoints)
@@ -34,8 +34,15 @@ def calculate_angle(p1, p2, p3):
     arg = np.dot(v1, v2) / (norm1 * norm2)
     return np.degrees(np.arccos(np.clip(arg, -1.0, 1.0)))
 
-def get_cow_id(filename):
-    """Extrai o ID da baia/vaca a partir do nome do arquivo."""
+def get_cow_id(img_path):
+    """Extrai o ID da baia/vaca a partir do nome do arquivo ou pasta pai."""
+    # Primeiro tenta pegar o nome da pasta pai (comum em datasets organizados por ID)
+    parent_name = img_path.parent.name
+    if parent_name.isdigit():
+        return parent_name
+
+    # Fallback para o nome do arquivo (legado)
+    filename = img_path.name
     parts = filename.split('_')
     for part in parts:
         if 'baia' in part.lower():
@@ -50,7 +57,7 @@ def extract_features():
     print(f"Carregando modelo: {MODEL_PATH}")
     model = YOLO(MODEL_PATH)
     data = []
-    image_files = list(DATASET_PATH.rglob('*.jpg'))
+    image_files = list(DATASET_PATH.rglob('*.jpg')) + list(DATASET_PATH.rglob('*.png'))
 
     if not image_files:
         print(f"Nenhuma imagem encontrada em {DATASET_PATH}")
@@ -109,7 +116,7 @@ def extract_features():
 
             data.append({
                 'filename': img_path.name,
-                'cow_id': get_cow_id(img_path.name),
+                'cow_id': get_cow_id(img_path),
                 'pelvic_ratio': pelvic_ratio,
                 'body_aspect': body_aspect_ratio,
                 'spine_prop_1': spine_ratio_1,

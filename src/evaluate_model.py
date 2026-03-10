@@ -33,7 +33,8 @@ def evaluate_model():
     
     # Full Report
     print("\nClassification Report per Cow:")
-    report = classification_report(y_test, y_pred, target_names=le.classes_)
+    target_names = [str(c) for c in le.classes_]
+    report = classification_report(y_test, y_pred, target_names=target_names)
     print(report)
     
     # Save results
