@@ -87,12 +87,14 @@ The project maintains the most stable and performant models in the `models/` dir
 
 ## 📜 Project Conclusion & Analysis
 
-For a comprehensive academic and technical deep-dive into this project, please refer to the **[FINAL_REPORT.md](FINAL_REPORT.md)**.
+For a comprehensive academic and technical deep-dive into this project, please refer to the final reports:
+- **[English Version: FINAL_REPORT.md](FINAL_REPORT.md)**
+- **[Versão em Português: FINAL_REPORT_PT.md](FINAL_REPORT_PT.md)**
 
-**Key Findings from the Report:**
+**Key Findings from the Reports:**
 - **Current Accuracy:** The system achieves a **24.10% identification accuracy** across 24 classes, significantly outperforming random chance (~4%).
 - **Primary Biometric Markers:** The "Pelvic Ratio" and "Withers Angle" were identified as the most discriminating features for individual cow identification.
-- **Roadmap for 90%+ Accuracy:** The report includes specialized recommendations such as Temporal Voting, Hybrid Geometry-Texture fusion, and Confidence-Weighted classification.
+- **Roadmap for 90%+ Accuracy:** The reports include specialized recommendations such as Temporal Voting, Hybrid Geometry-Texture fusion, and Confidence-Weighted classification.
 
 ## 📊 Documentation
 For detailed information on the biometric methodology, please refer to the files in the `docs/` folder.
